@@ -1,0 +1,15 @@
+sourceSets {
+    main {
+        java {
+            srcDirs  'src/main/java','../Common/src/main/java'
+            srcDirs  'src/main/java','../Data/src/main/java'
+        }
+    }
+}
+dependencies {
+    compile project(':Data')
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile "io.jsonwebtoken:jjwt:0.7.0"
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.3'
+}

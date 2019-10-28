@@ -1,0 +1,20 @@
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java','../Service/src/main/java'
+            srcDirs 'src/main/java','../Common/src/main/java'
+            srcDirs 'src/main/java','../Data/src/main/java'
+        }
+    }
+}
+
+configurations {
+    compile.exclude module: "spring-boot-starter-tomcat"
+}
+dependencies {
+    compile project(':Service')
+    compile ("org.springframework.boot:spring-boot-starter-web")
+    compile ("org.springframework.boot:spring-boot-starter-undertow")//容器tomcat之类
+    compile ("org.springframework.boot:spring-boot-starter-actuator")//（健康监控）配置和使用
+
+}

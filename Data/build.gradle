@@ -1,0 +1,19 @@
+//解决问题1：本模块无法依赖其他模块的java文件
+//解决问题2：主类名称.加在springboot主类所在模块上会会导致主类不能读自己的依赖错误
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java','../Common/src/main/java']
+        }
+    }
+}
+//jar {
+//    manifest {
+//        attributes 'Main-Class': 'ecovacs.ClientApplication'
+//    }
+//}
+dependencies {
+    compile project(':Common')
+    compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile('mysql:mysql-connector-java:5.1.48')
+}

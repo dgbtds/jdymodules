@@ -1,0 +1,6 @@
+rootProject.name = 'parent'
+include 'Common'
+include 'Data'
+include 'Service'
+include 'client'
+
