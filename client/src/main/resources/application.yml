@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    active: pro
+
+  devtools:      #热部署
+     restart:
+      enabled: false

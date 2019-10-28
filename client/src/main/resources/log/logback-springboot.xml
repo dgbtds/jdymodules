@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true" scanPeriod="60 seconds" debug="true">
+
+    <contextName>logback</contextName>
+    <!--application.yml 传递参数，不能使用logback 自带的<property>标签 windows失败-->
+<!--    <springProperty scope="context" name="appname" source="logback.appname"/>-->
+<!--    <springProperty scope="context" name="logdir" source="logback.logdir"/>-->
+<!--    文件配置-->
+    <property name="logback.logdir" value="D:\\logs\\springboot\\log"/>
+    <property name="logback.appname" value="JDY"/>
+    <!--日志文件的存储地址-->
+<!--  和下面的file只有一个可以生效  <property name="log.path" value="D:\logs\springboot\log" />-->
+
+    <!--输出到控制台 名字随便写-->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>debug</level>
+        </filter>
+        <withJansi>true</withJansi>
+        <!--控制台日志配置,控制台输出使用layout-->
+<!--        <layout class="ch.qos.logback.classic.PatternLayout">-->
+<!--                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %magenta([%thread])%n (%-5level) %cyan(%logger{15}) - %msg%n-->
+<!--                </pattern>-->
+<!--        </layout>>-->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d -1 %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <!--输出到文件-->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则
+        如果同时有<File>和<FileNamePattern>，那么当天日志是<File>，明天会自动把今天
+        的日志改名为今天的日期。即，<File> 的日志都是当天的。-->
+        <File>${logback.logdir}\info.${logback.appname}.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--文件路径,定义了日志的切分方式——把每一天的日志归档到一个文件中,以防止日志填满整个磁盘空间-->
+            <FileNamePattern>${logback.logdir}\info.${logback.appname}.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--只保留最近90天的日志-->
+            <maxHistory>90</maxHistory>
+            <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
+            <!--<totalSizeCap>1GB</totalSizeCap>-->
+        </rollingPolicy>
+<!--        文件输出使用encoder-->
+        <encoder>
+            <!--格式化输出：%d:表示日期    %thread:表示线程名     %-5level:级别从左显示5个字符宽度  %msg:日志消息    %n:是换行符-->
+            <pattern>--------------> %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <!--自定义日志等级-->
+    <logger name="cn.ihep.jdy.release.controller" level="debug"/>
+    <!--全局日志等级-->
+    <root level="debug">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="file" />
+    </root>
+
+</configuration>

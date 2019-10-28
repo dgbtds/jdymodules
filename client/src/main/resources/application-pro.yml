@@ -1,0 +1,51 @@
+spring:
+  mvc:
+    view:
+      suffix:
+      prefix:
+  datasource:
+   url: jdbc:mysql://rm-uf600pbby82xdnbh2go.mysql.rds.aliyuncs.com:3306/jdyrobot2?useSSL=false
+   username: xmm
+   password: Oi9$W7@6Xx&m16D
+   driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    show-sql: false
+  redis:
+    host: 47.100.188.237
+    port: 6379
+    password: LS348932
+    database: 1
+  devtools:
+    restart:
+      enabled: true
+  servlet:
+    multipart:
+      max-request-size: 10MB
+      max-file-size: 10MB
+
+#    sentinel:
+#      master: mymaster
+#      nodes: localhost:26379
+
+
+
+jwt:
+     secret: G5$wk&9O#S30@1xP
+     expiration: 86400
+
+server:
+  port: 8082
+
+#log
+logging:
+  config: classpath:log/logback-springboot.xml
+
+base:
+  url: http://47.100.188.237/
+  Path: /data
+
+
+
