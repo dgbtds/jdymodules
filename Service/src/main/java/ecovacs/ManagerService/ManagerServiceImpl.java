@@ -90,8 +90,7 @@ public class ManagerServiceImpl implements ManagerService {
         if (list.size()==0){
             return new ResultModel(5,"不存在此组号");
         }
-        map.put("groupId"+groupid,list);
-        resultModel.setData(map);
+        resultModel.setData(list);
 
         return resultModel;
     }

@@ -7,7 +7,7 @@
 <!--    <springProperty scope="context" name="appname" source="logback.appname"/>-->
 <!--    <springProperty scope="context" name="logdir" source="logback.logdir"/>-->
 <!--    文件配置-->
-    <property name="logback.logdir" value="D:\\logs\\springboot\\log"/>
+    <property name="logback.logdir" value="/data/robot2.0/log"/>
     <property name="logback.appname" value="JDY"/>
     <!--日志文件的存储地址-->
 <!--  和下面的file只有一个可以生效  <property name="log.path" value="D:\logs\springboot\log" />-->
@@ -33,10 +33,10 @@
             <!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则
         如果同时有<File>和<FileNamePattern>，那么当天日志是<File>，明天会自动把今天
         的日志改名为今天的日期。即，<File> 的日志都是当天的。-->
-        <File>${logback.logdir}\info.${logback.appname}.log</File>
+        <File>${logback.logdir}/info.${logback.appname}.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!--文件路径,定义了日志的切分方式——把每一天的日志归档到一个文件中,以防止日志填满整个磁盘空间-->
-            <FileNamePattern>${logback.logdir}\info.${logback.appname}.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>${logback.logdir}/info.${logback.appname}.%d{yyyy-MM-dd}.log</FileNamePattern>
             <!--只保留最近90天的日志-->
             <maxHistory>90</maxHistory>
             <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->

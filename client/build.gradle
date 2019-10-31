@@ -13,6 +13,7 @@ configurations {
 }
 dependencies {
     compile project(':Service')
+
     compile ("org.springframework.boot:spring-boot-starter-web")
     compile ("org.springframework.boot:spring-boot-starter-undertow")//容器tomcat之类
     compile ("org.springframework.boot:spring-boot-starter-actuator")//（健康监控）配置和使用
