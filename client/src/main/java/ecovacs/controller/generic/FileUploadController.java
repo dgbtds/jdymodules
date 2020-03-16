@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @RestController
-@Api( tags={"上传文件"})
+@Api( tags={"上传下载文件接口"})
 @RequestMapping("/company")
 public class FileUploadController {
     @Autowired
@@ -38,7 +38,7 @@ public class FileUploadController {
     @Value("${base.path}")
     private String basepath;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadController.class);
-    @ApiOperation(value = "置业顾问上传文件,必须带上传文件的后缀名，上传xxx.jpg则应该命名yyyy.jpg")
+    @ApiOperation(value = "置业顾问上传文件,上传文件必须指定参数名为file")
     @ApiImplicitParams({
 
             @ApiImplicitParam(
@@ -63,8 +63,8 @@ public class FileUploadController {
 
         String prefixName = basepath+ File.separator+"img"+File.separator;
         //String path =prefixName;
-        String filename = prefixName +"company_"+ companyId+ File.separator+"_accepter_"+aiUserId+ File.separator +
-                new SimpleDateFormat("yyyy-mm-dd").format(new Date())+suffixName;
+        String filename = prefixName +"company_"+ companyId+ File.separator+"Accepter"+ File.separator+aiUserId +
+                suffixName;
         ResultModel resultModel = upload(accepterPhoto, filename);
         if(resultModel.getStatus()==0){
             byUserId.setUpLogo(filename);
@@ -117,6 +117,9 @@ public class FileUploadController {
             dir.mkdirs();
         }
         File dest = new File(filePath);
+        if (dest.exists()){
+            dest.delete();
+        }
         try {
             file.transferTo(dest);
             LOGGER.info(dest+"上传成功");
@@ -131,7 +134,7 @@ public class FileUploadController {
 
             @ApiImplicitParam(
                     name = "aiUserId",
-                    value ="顾问Id",
+                    value ="销售顾问Id",
                     required = true,
                     paramType = "query",
                     dataType = ""

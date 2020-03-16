@@ -28,15 +28,16 @@ public class JwtUserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException(String.format("No com.jdy.client.controller.user found with username '%s'.", username));
         }
         List<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_SALER");
         if ((user.getRoleId()==1007L)){
 
             GrantedAuthority grantedAuthority2 = new SimpleGrantedAuthority("ROLE_Manager");
             authorities.add(grantedAuthority2);
         }
+        if ((user.getRoleId()==1004L)){
 
-        authorities.add(grantedAuthority);
-
+            GrantedAuthority grantedAuthority2 = new SimpleGrantedAuthority("ROLE_SALER");
+            authorities.add(grantedAuthority2);
+        }
         return new UserPrincipal(user.getMobile(),user.getPassWord(),user.getId(),authorities);//这是数据库里面的用户名密码构成的pringciple
     }
 

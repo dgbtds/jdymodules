@@ -13,9 +13,8 @@ import java.sql.Timestamp;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "com.jdy.client.controller.customer",uniqueConstraints ={
+@Table(name = "customer",uniqueConstraints ={
         @UniqueConstraint(columnNames = {"mobile","company_id"})
-
 })
 @ApiModel(value = "客户属性表")
 public class AiCustomer {
@@ -92,6 +91,7 @@ public class AiCustomer {
 
     @ApiModelProperty(value = "购房预算")
     private String budget;
+
 
 
 

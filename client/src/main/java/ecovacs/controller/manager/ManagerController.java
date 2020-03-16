@@ -21,8 +21,128 @@ import org.springframework.web.bind.annotation.RestController;
 public class ManagerController {
     @Autowired
     private ManagerService managerService;
+    @ApiOperation(value = "获得销售顾问在Accepter表登记记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "aiUserId",
+                    value= "销售顾问Id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
 
-    @ApiOperation( value = "转交：将一个置业顾问的客户全部转交给另一个置业顾问" )
+    } )
+    @RequestMapping(value = "/getAccepterInfo",method = RequestMethod.POST)
+    public ResultModel getMyself(@RequestParam Long managerId,@RequestParam Long aiUserId) {
+        ResultModel result = managerService.getMyself(managerId,aiUserId);
+        return result;
+    }
+    @ApiOperation(value = "重置redis")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "managerId",
+                    value = "管理id",
+                    required = true,
+                    paramType = "query",
+                    dataType = "Long")
+        }
+           )
+
+
+    @RequestMapping(value = "/resetRedis",method = RequestMethod.POST)
+    public ResultModel resetRedis(@RequestParam Long managerId){
+        ResultModel result = managerService.resetRedis(managerId);
+        return result;
+    }
+    @ApiOperation(value = "注册账号")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "mobile",
+                    value= "注册手机号",
+                    required= true,
+                    paramType="query"
+                   )
+            ,
+            @ApiImplicitParam(
+                    name= "passwd",
+                    value= "密码",
+                    required= true,
+                    paramType="query"
+                   )
+            ,
+            @ApiImplicitParam(
+                    name= "role",
+                    value= "权限",
+                    required= true,
+                    paramType="query"
+                   )
+
+    } )
+    @RequestMapping(value = "/register",method = RequestMethod.POST)
+    public ResultModel register(@RequestParam Long managerId,@RequestParam String mobile,@RequestParam String passwd,@RequestParam String role,@RequestParam String name) {
+        ResultModel result = managerService.register(managerId,mobile,passwd,role,name);
+        return result;
+    }
+    @ApiOperation(value = "注册多个销售账号")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "mobile",
+                    value= "注册手机号",
+                    required= true,
+                    paramType="query",
+                    allowMultiple=true//数组认定
+                   )
+
+    } )
+    @RequestMapping(value = "/registerAll",method = RequestMethod.POST)
+    public ResultModel registerAll(@RequestParam Long managerId,@RequestParam String[] mobile,@RequestParam String[] name) {
+        ResultModel result = managerService.registerALL(managerId,mobile,name);
+        return result;
+    }
+    @ApiOperation(value = "获得销售顾问在User表登记记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "aiUserId",
+                    value= "销售顾问Id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+
+    } )
+    @RequestMapping(value = "/getUserInfo",method = RequestMethod.POST)
+    public ResultModel getPriRecord(@RequestParam Long managerId,@RequestParam Long aiUserId) {
+
+        return managerService.getPriRecord(managerId,aiUserId);
+    }
+
+    @ApiOperation( value = "转交All：将一个置业顾问的客户全部转交给另一个置业顾问" )
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name= "managerId",
@@ -45,10 +165,47 @@ public class ManagerController {
                     paramType="query",
                     dataType="Long")
     } )
-    @RequestMapping(value ="/transfer",method = RequestMethod.POST)
-    public ResultModel transfer(@RequestParam Long managerId, @RequestParam  Long fromaiUserId, @RequestParam  Long toaiUserId){
+    @RequestMapping(value ="/transferAll",method = RequestMethod.POST)
+    public ResultModel transferAll(@RequestParam Long managerId, @RequestParam  Long fromaiUserId, @RequestParam  Long toaiUserId){
 
-        return  managerService.transfer(managerId,fromaiUserId,toaiUserId);
+        return  managerService.transferAll(managerId,fromaiUserId,toaiUserId);
+
+    }
+    @ApiOperation( value = "转交One：将一个置业顾问的某一个客户转交给另一个置业顾问" )
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "fromaiUserId",
+                    value= "被转交者id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "toaiUserId",
+                    value= "转交人",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            , @ApiImplicitParam(
+            name= "customerId",
+            value= "转交客户Id",
+            required= true,
+            paramType="query",
+            dataType="Long")
+
+
+    } )
+    @RequestMapping(value ="/transferAll",method = RequestMethod.POST)
+    public ResultModel transferOne(@RequestParam Long managerId, @RequestParam  Long fromAiUserId, @RequestParam  Long toaiUserId,@RequestParam Long customerId){
+
+        return  managerService.transferOne(managerId,fromAiUserId,toaiUserId,customerId);
 
     }
     @ApiOperation(
@@ -352,6 +509,39 @@ public class ManagerController {
             return new ResultModel(1003);
         }
         ResultModel resultModel = managerService.setworkStatus(managerId,aiUserId,status);
+        return  resultModel;
+    }
+    @ApiOperation(
+            value = "设置销售评分"
+    )
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "aiUserId",
+                    value= "置业顾问id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "score",
+                    value= "置业顾问评分",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+    } )
+    @RequestMapping(value = "/setScore",method = RequestMethod.POST)
+    public ResultModel setGrace(@RequestParam Long managerId,@RequestParam Long aiUserId,@RequestParam Long score) {
+        if(score<0||score>100){
+            return new ResultModel(1003,"评分错误");
+        }
+        ResultModel resultModel = managerService.setGrace(managerId,aiUserId,score);
         return  resultModel;
     }
     @ApiOperation(

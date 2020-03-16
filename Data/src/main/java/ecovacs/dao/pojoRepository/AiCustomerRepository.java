@@ -16,7 +16,7 @@ public interface AiCustomerRepository extends JpaRepository<AiCustomer,Long> {
     @Query("select p from AiCustomer p where p.id in ?1")
     List<AiCustomer> findByIdIn(Long[] idArray);
     List<AiCustomer> findAiCustomersByCompanyId(Long companyId);
-
+    Long countByCounselorId(Long aiUserId);
     AiCustomer findByMobile(String mobile);
 
     @Transactional

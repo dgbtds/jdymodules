@@ -33,13 +33,14 @@ public interface AiUserRepository extends JpaRepository<AiUser,Long> {
     @Modifying
     @Query("update AiUser t set t.groupId = ?2 where t.userId = ?1")
     int updateGroupId(Long userId, int GroupId);
-    @Query(" select count (t) as num,t.groupId as groupId from AiUser t where t.companyId=?1 group by groupId")
+    @Query(" select count (t) as num,t.groupId as groupId from AiUser t where t.companyId=?1 group by groupId ")
     List<Map<String,Object>>  countByCompanyIdGrAndGroupId(Long companyId);
 
     @Query("select count (t) as num from AiUser t where t.companyId=?1 group by t.groupId")
     List<Map<String,Object>>   getGroupNumByCompanyId(Long companyId);
 
-
+    @Query("select a from AiUser as a where a.groupId>0 ")
+    List<AiUser> getGroupInfo(Long companyId);
 
     List<AiUser> findAiUsersByCompanyId(Long companyId);
 }

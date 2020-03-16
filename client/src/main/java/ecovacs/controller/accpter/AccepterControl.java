@@ -32,6 +32,7 @@ public class AccepterControl {
         ResultModel result = userService.getWorkStatus(aiUserId);
         return result;
     }
+
     @ApiOperation(value = "修改销售在岗与否属性")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -52,6 +53,27 @@ public class AccepterControl {
     @RequestMapping(value = "/workStatus",method = RequestMethod.POST)
     public ResultModel workStatus(@RequestParam  Long aiUserId,@RequestParam Integer status) {
         return   userService.workStatus(aiUserId,status);
+
+    }
+    @ApiOperation(value = "修改销售密码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "aiUserId",
+                    value= "置业顾问id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "Newpassword",
+                    value= "新密码",
+                    required= true,
+                    paramType="query")
+
+    } )
+    @RequestMapping(value = "/changePW",method = RequestMethod.POST)
+    public ResultModel changePW(@RequestParam  Long aiUserId,@RequestParam String Newpassword ) throws Exception {
+        return   userService.changePW(aiUserId,Newpassword);
 
     }
     @ApiOperation(value = "获得客户详细信息")
@@ -110,7 +132,8 @@ public class AccepterControl {
         if(aiCustomer.getName()==null||aiCustomer.getMobile()==null||aiCustomer.getCustomerLogo()==null){
             return new ResultModel(1003);
         }
-        return  userService.setCustomer(aiCustomer,aiUserId);
+        ResultModel resultModel = userService.setCustomer(aiCustomer, aiUserId);
+        return resultModel;
     }
 
     @ApiOperation(value = "增加客户跟进记录")

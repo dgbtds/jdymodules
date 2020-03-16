@@ -1,9 +1,16 @@
 package ecovacs.pojo;
 
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 
 @Entity
-@Table(name = "alluser")
+@DynamicUpdate
+@DynamicInsert
+@Table(name = "alluser",uniqueConstraints ={
+        @UniqueConstraint(columnNames = {"mobile"})}
+)
 public class User{
 
     @Id

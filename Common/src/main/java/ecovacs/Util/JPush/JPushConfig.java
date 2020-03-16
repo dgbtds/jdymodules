@@ -10,7 +10,6 @@ import cn.jpush.api.push.model.audience.Audience;
 import cn.jpush.api.push.model.audience.AudienceTarget;
 import cn.jpush.api.push.model.notification.IosNotification;
 import cn.jpush.api.push.model.notification.Notification;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,10 +22,8 @@ import java.util.Map;
 public class JPushConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(JPushConfig.class);
-    //private static final String MASTER_SECRET="b1dd60fc7b5fd76985d23299";
-    //private static final String APP_KEY="1fd347c6837727e5c46b1c70";
-    private static final String MASTER_SECRET="408cec58a8f855f250b81fe2";//JPush服务器端下发的master_key
-    private static final String APP_KEY="fdef37f47313298c09f12c9b";//JPush服务器端下发的app_key
+    private static final String MASTER_SECRET="e58cc1dd579604f1eb3c253b";//JPush服务器端下发的master_key
+    private static final String APP_KEY="f2188d83c29951d8e495a173";//JPush服务器端下发的app_key
 
     /**
      * 构建推送对象：对所有平台，所有设备，内容为 alert的通知
@@ -103,7 +100,7 @@ public class JPushConfig {
         return PushPayload.newBuilder()
                 .setPlatform(Platform.android_ios())
                 .setAudience(Audience.newBuilder()
-//                        .addAudienceTarget(AudienceTarget.tag(tags))
+                        //.addAudienceTarget(AudienceTarget.tag("JIGUANG-TagAliasHelper"))
                         .addAudienceTarget(AudienceTarget.alias(aliases))
                         .build())
                 .setMessage(Message.newBuilder()
@@ -135,12 +132,10 @@ public class JPushConfig {
         }
     }
 
-    public void send(String msg,String aliases){
+    public static void send(String msg,String aliases){
         String master_secret= JPushConfig.MASTER_SECRET;
         String app_key= JPushConfig.APP_KEY;
         JPushClient jpushClient = new JPushClient(master_secret,app_key, null, ClientConfig.getInstance());
-//        PushPayload payload = JPushConfig.buildPushObject_ios_audienceMore_messageWithExtras(msg,new String[1], new String[1]);
-//        PushPayload payload = JPushConfig.buildPushObject_all_all_alert(msg);
         PushPayload payload = JPushConfig.buildPushObject_ios_audienceMore_messageWithExtras(msg,aliases);
         try {
             PushResult result = jpushClient.sendPush(payload);
@@ -158,7 +153,42 @@ public class JPushConfig {
             logger.info("JPush返回的错误信息: " + e.getErrorMessage());
         }
     }
+    public static void send0(String msg,String aliases){
+        String master_secret= JPushConfig.MASTER_SECRET;
+        String app_key= JPushConfig.APP_KEY;
+        JPushClient jpushClient = new JPushClient(master_secret,app_key, null, ClientConfig.getInstance());
+        PushPayload payload = JPushConfig.buildPushObject_all_alias_alert(aliases,msg);
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+            logger.info("Got result - " + result);
 
+        } catch (APIConnectionException e) {
+            // Connection error, should retry later
+            logger.info("Connection error, should retry later "+e);
+
+        } catch (APIRequestException e) {
+            // Should review the error, and fix the request
+            logger.info("根据返回的错误信息核查请求是否正确"+e);
+            logger.info("HTTP 状态信息码: " + e.getStatus());
+            logger.info("JPush返回的错误码: " + e.getErrorCode());
+            logger.info("JPush返回的错误信息: " + e.getErrorMessage());
+        }
+    }
+    public static void testSend(){
+        ClientConfig clientConfig = ClientConfig.getInstance();
+        final JPushClient jpushClient = new JPushClient(MASTER_SECRET, APP_KEY, null, clientConfig);
+        final PushPayload payload = buildPushObject_all_all_alert("test from ihep");
+        try {
+            PushResult result = jpushClient.sendPush(payload);
+            System.out.println(result);
+            // 如果使用 NettyHttpClient，需要手动调用 close 方法退出进程
+            // If uses NettyHttpClient, call close when finished sending request, otherwise process will not exit.
+            // jpushClient.close();
+        } catch (APIConnectionException e) {
+
+        } catch (APIRequestException e) {
+        }
+    }
 
     public static void main(String[] args) {
         JPushConfig jPushConfig = new JPushConfig();
@@ -169,32 +199,8 @@ public class JPushConfig {
         map.put("counselorName","wdh");
         map.put("userId","9");
         map.put("customerId","2");
-        System.out.println(JSONObject.toJSONString(map));
-        jPushConfig.send(JSONObject.toJSONString(map),"6");
+       send0("hello to 8","8");
 
-
-//        String master_secret=JPushConfig.MASTER_SECRET;
-//        String app_key=JPushConfig.APP_KEY;
-//        JPushClient jpushClient = new JPushClient(master_secret,app_key, null, ClientConfig.getInstance());
-//        //PushPayload payload = PushConfig.buildPushObject_all_all_alert("消息推送");
-//        //PushPayload payload=PushConfig.buildPushObject_android_tag_alertWithTitle("tag1", "123", "123", null);
-//        PushPayload payload = JPushConfig.buildPushObject_all_all_alert("测试");
-//
-//        try {
-//            PushResult result = jpushClient.sendPush(payload);
-//            System.out.println("Got result - " + result);
-//
-//        } catch (APIConnectionException e) {
-//            // Connection error, should retry later
-//            System.out.print("Connection error, should retry later "+e);
-//
-//        } catch (APIRequestException e) {
-//            // Should review the error, and fix the request
-//            System.out.println("根据返回的错误信息核查请求是否正确"+e);
-//            System.out.println("HTTP 状态信息码: " + e.getStatus());
-//            System.out.println("JPush返回的错误码: " + e.getErrorCode());
-//            System.out.println("JPush返回的错误信息: " + e.getErrorMessage());
-//        }
     }
 
 }

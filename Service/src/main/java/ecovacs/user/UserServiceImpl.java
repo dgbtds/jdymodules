@@ -3,15 +3,10 @@ package ecovacs.user;
 import ecovacs.cache.CacheService;
 import ecovacs.common.CommonService;
 import ecovacs.dao.model.ResultModel;
-import ecovacs.dao.pojoRepository.AiCustomerRepository;
-import ecovacs.dao.pojoRepository.AiUserRepository;
-import ecovacs.dao.pojoRepository.CustomerFollowRepository;
-import ecovacs.dao.pojoRepository.CustomerVisitRepository;
-import ecovacs.pojo.AiCustomer;
-import ecovacs.pojo.AiUser;
-import ecovacs.pojo.CustomerFollowUp;
-import ecovacs.pojo.CustomerVisit;
+import ecovacs.dao.pojoRepository.*;
+import ecovacs.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +28,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AiUserRepository aiUserRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private CommonService commonService;
@@ -50,16 +47,13 @@ public class UserServiceImpl implements UserService {
             return new ResultModel(1003,"无此销售顾问");
         }
         Long companyId = aiUser.getCompanyId();
-        String prefixName = "/data"+ File.separator+"img"+File.separator;
 
         String customerLogo = aiCustomer.getCustomerLogo();
-        String path = prefixName +"company_"+ companyId+ File.separator+"Customer"+ File.separator +customerLogo;
+        String path = customerLogo;
 
         AiCustomer aiCustomerCheck =aiCustomerRepository.findAiCustomerByCompanyIdAndMobile(companyId, aiCustomer.getMobile());
         Long acceptTimes = aiUser.getAcceptTimes();
         if (aiCustomerCheck==null) {
-
-
             aiCustomer.setCounselorId(aiUserId);
             aiCustomer.setVisitNum(1L);
             aiCustomer.setCompanyId(companyId);
@@ -80,8 +74,11 @@ public class UserServiceImpl implements UserService {
 
             aiUser.setDistributeCount(aiUser.getDistributeCount()+1);
             aiUser.setAcceptTimes(acceptTimes-1);
+            aiUser.setAccepterStatus(1L);
            aiUserRepository.save(aiUser);
-            cacheService.backToWait(aiUserId,companyId,aiUser.getGroupId());
+           if(acceptTimes>1) {
+               cacheService.backToWait(aiUserId,companyId,aiUser.getGroupId());
+           }
             resultModel.setMessage("顾客首次来访");
         }
         else {
@@ -109,8 +106,11 @@ public class UserServiceImpl implements UserService {
             aiCustomerCheck.setTime(new Timestamp(System.currentTimeMillis()));
             aiCustomerRepository.save(aiCustomerCheck);
 
-            cacheService.backToWait(aiUserId,companyId,aiUser.getGroupId());
+            if(acceptTimes>1) {
+                cacheService.backToWait(aiUserId,companyId,aiUser.getGroupId());
+            }
             aiUser.setAcceptTimes(acceptTimes-1);
+            aiUser.setAccepterStatus(1L);
             aiUserRepository.save(aiUser);
         }
 
@@ -157,27 +157,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResultModel getMyCustomer(Long aiUserId) {
+        AiUser byUserId = aiUserRepository.findByUserId(aiUserId);
+        if (byUserId==null){
+            return new ResultModel(1003,"没有此销售人员");
+        }
         List<AiCustomer> myCustomersList = aiCustomerRepository.findAiCustomersByCounselorId(aiUserId);
 
         ResultModel resultModel=new ResultModel(0);
-//        Map<String,Object> map=new HashMap<>();
-//        Map<Long, AiCustomer> collect = myCustomersList.stream().collect(Collectors.toMap(
-//                AiCustomer::getId,
-//                a -> a
-//                , ((k1, k2) -> k1)
-//                )
-//        );
-//        collect.forEach((k,v)->{
-//                    Map<String,Object> simpleCustomerInfo=new HashMap<>();
-//                    simpleCustomerInfo.put("customerId",v.getId());
-//                    simpleCustomerInfo.put("customerName",v.getName());
-//                    simpleCustomerInfo.put("customerMobile",v.getMobile());
-//                    simpleCustomerInfo.put("customerLogo",v.getCustomerLogo());
-//                    simpleCustomerInfo.put("customerVisiNum",v.getVisitNum());
-//                    simpleCustomerInfo.put("customerLastVisiTime",v.getTime());
-//                    map.put( String.valueOf(v.getId()),simpleCustomerInfo);
-//                }
-//        );
 
         resultModel.setData(myCustomersList);
 
@@ -212,9 +198,9 @@ public class UserServiceImpl implements UserService {
         customerFollowUp.setCreateTime(new Timestamp(System.currentTimeMillis()));
         customerFollowUp.setCustomerId(customerId);
         customerFollowUp.setStatus(1);
-        CustomerFollowUp save = customerFollowRepository.save(customerFollowUp);
+        customerFollowRepository.save(customerFollowUp);
         ResultModel resultMode = new ResultModel(0);
-        return new ResultModel(0);
+        return resultMode;
     }
 
     @Override
@@ -228,7 +214,36 @@ public class UserServiceImpl implements UserService {
         ResultModel resultMode = new ResultModel(0);
 
         resultMode.setData(customerFollowUps);
-        return new ResultModel(0);
+        return resultMode;
+    }
+
+    @Override
+    public ResultModel getMyself(Long aiUserId) {
+        AiUser byUserId = aiUserRepository.findByUserId(aiUserId);
+        User user = userRepository.getOne(aiUserId);
+        if (byUserId==null||user==null){
+            return new ResultModel(1003,"销售未记录");
+        }
+        ResultModel resultModel = new ResultModel(0);
+        resultModel.setData(user);
+        resultModel.setData(byUserId);
+        return resultModel;
+    }
+    public static String passEncode(String pass) throws Exception {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        String encode = bCryptPasswordEncoder.encode(pass);
+        return encode;
+    }
+    @Override
+    public ResultModel changePW(Long aiUserId, String newPassWord) throws Exception {
+        User user = userRepository.getOne(aiUserId);
+        if (user==null){
+            return new ResultModel(1003,"销售未记录");
+        }
+        user.setPassWord(passEncode(newPassWord));
+        userRepository.save(user);
+        ResultModel resultModel = new ResultModel(0);
+        return resultModel;
     }
 
     @Transactional

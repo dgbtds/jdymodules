@@ -313,6 +313,15 @@ public class Redis {
 	public Long size(String key) {
 		return redisTemplate.opsForValue().size(key);
 	}
+	/**
+	 * 获取list的长度
+	 *
+	 * @param key
+	 * @return
+	 */
+	public Long lsize(String key) {
+		return redisTemplate.opsForList().size(key);
+	}
 
 	/**
 	 * 批量添加
@@ -737,6 +746,36 @@ public class Redis {
 			long timeout, TimeUnit unit) {
 		return redisTemplate.opsForList().rightPopAndLeftPush(sourceKey,
 				destinationKey, timeout, unit);
+	}
+
+
+
+	public int lhasValue(String key,String value){
+		Long size = redisTemplate.opsForList().size(key);
+		int count=0;
+		long time = System.currentTimeMillis();
+		boolean find =false;
+		for (int i=0;i<size;i++){
+		String s = redisTemplate.opsForList().leftPop(key);
+		redisTemplate.opsForList().leftPush(key+time,s);
+			count=i;
+		if (s.equals(value)){
+			find=true;
+			break;
+		}
+
+		}
+		for (int i=0;i<count+1;i++){
+			String s = redisTemplate.opsForList().leftPop(key + time);
+			redisTemplate.opsForList().leftPush(key, s);
+			redisTemplate.expire(key,1,TimeUnit.DAYS);
+		}
+		if (find){
+			return count;
+		}
+		else {
+			return -1;
+		}
 	}
 
 	/**

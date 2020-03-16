@@ -45,6 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .passwordEncoder(passwordEncoder());
     }
 
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -64,8 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         //authorizeRequests():允许所有用户访问"/"
         httpSecurity
                 .authorizeRequests()
-                .antMatchers("/manager/*", "/accepter/*", "/com/jdy/client/controller/user/go", "/robot-websocket", "/robot-websocket/**",
-                        "/com/jdy/client/controller/customer/*", "/company/*")
+                .antMatchers("/manager/*","/getWeek", "/accepter/*", "/user/go", "/robot-websocket", "/robot-websocket/**",
+                        "/customer/*", "/company/*")
                 .permitAll()
                 //  .antMatchers("manager/**").hasAnyRole("Manager")
                 .anyRequest().authenticated();
@@ -83,8 +84,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/swagger-resources/configuration/ui",
                 "/swagger-resources/configuration/security",//用来获取支持的动作
                 "/swagger-resources",//用来获取api-docs的URI
-                "/swagger-resources/configuration/com.jdy.client.controller.security",//安全选项
-                "/swagger-ui.html","/webjars/**/*");
+                "/swagger-ui.html",
+                "/webjars/**",
+                "/data/img/**");
     }
 
 }

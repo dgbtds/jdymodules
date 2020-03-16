@@ -11,4 +11,6 @@ public interface CustomerService {
 
     ResultModel uploadLogo(Long customerId, String logoPath);
 
+    ResultModel choseone2(Long aiUserId, String customerLogo, Long[] aiUserIds);
+
 }

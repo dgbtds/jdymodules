@@ -23,4 +23,8 @@ public interface UserService {
     ResultModel getVisitReview(Long customerId, Long aiUserId);
 
     ResultModel getCustomerRecord(Long customerId, Long aiUserId);
+
+    ResultModel getMyself(Long aiUserId);
+
+    ResultModel changePW(Long aiUserId, String newpassword) throws Exception;
 }

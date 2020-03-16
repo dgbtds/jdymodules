@@ -1,8 +1,6 @@
 spring:
-  mvc:
-    view:
-      suffix:
-      prefix:
+  resources:
+    static-locations: classpath:/data/img
   datasource:
    url: jdbc:mysql://rm-uf600pbby82xdnbh2go.mysql.rds.aliyuncs.com:3306/jdyrobot2?useSSL=false
    username: xmm
@@ -14,7 +12,7 @@ spring:
     database: mysql
     show-sql: false
   redis:
-    host: 47.100.188.237
+    host: 39.98.35.119
     port: 6379
     password: LS348932
     database: 1
@@ -44,8 +42,11 @@ logging:
   config: classpath:log/logback-springboot.xml
 
 base:
-  url: http://47.100.188.237/
+  url: http://39.98.35.119/
   Path: /data
 
+file:
+  staticAccessPath: /data/img/**
+  uploadFolder: /data/img/
 
 

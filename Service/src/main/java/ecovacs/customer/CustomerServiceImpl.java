@@ -12,15 +12,19 @@ import ecovacs.pojo.AiUser;
 import ecovacs.pojo.RobotRecord;
 import ecovacs.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.*;
 
 @SuppressWarnings("ALL")
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
+    @Value("${base.path}")
+    private String basepath;
     @Autowired
     private AiCustomerRepository aiCustomerRepository;
 
@@ -42,8 +46,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private AiUserRepository aiUserRepository;
 
-    @Autowired
-    private JPushConfig jPushConfig;
 
 
     @Autowired
@@ -61,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public ResultModel firstVisit(String robotId) {
         if(NonUtil.isNon(robotId)){
-            return new ResultModel(1003);
+            return new ResultModel(1003,"机器人id不存在");
         }
         ResultModel resultModel = new ResultModel(0);
 
@@ -76,20 +78,26 @@ public class CustomerServiceImpl implements CustomerService {
         User manager = userRepository.getOne(robotRecord.getUserId());
         Long managerId=manager.getId();
 
-
-        int groupnum=aiUserRepository.getGroupNumByCompanyId(companyId).size()-1;
-            if(groupnum<=0){
-                return new ResultModel(4,"没有工作组");
+            if(!cacheService.haseWorkGroup(companyId)){
+                cacheService.resetAccepters(companyId);
+                    if(!cacheService.haseWorkGroup(companyId)) {
+                        return new ResultModel(4,"当前公司没有工作组,测试问题！！！！！");
+                    }
             }
         List<AiUser> recommendlist=new ArrayList<>();
         List<Long> recommendId;
         do {
             recommendId=cacheService.getAcceptersBycompanyIdAndGroupId(companyId,3);
+            if (recommendId==null){
+                cacheService.setAccepterGroupByCompanyId(companyId);
+                return new ResultModel(5,"数据库错误,已重置");
+            }
             }while (recommendId.size()==0);
+
         for (Long aiUserId:recommendId){
             AiUser aiUser = aiUserRepository.findByUserId(aiUserId);
-            Optional<User> user = userRepository.findById(aiUserId);
-            aiUser.setName(user.get().getName());
+            aiUser.setAccepterStatus(0L);
+            aiUserRepository.save(aiUser);
             recommendlist.add(aiUser);
         }
 
@@ -104,11 +112,16 @@ public class CustomerServiceImpl implements CustomerService {
     if(NonUtil.isNon(aiUserId,customerLogo)){
         return new ResultModel(1003);
     }
-   AiUser aiUser = aiUserRepository.findByUserId(aiUserId);
+        AiUser aiUser = aiUserRepository.findByUserId(aiUserId);
+        Long companyId = aiUser.getCompanyId();
+        aiUser.setAccepterStatus(0L);
+        aiUserRepository.save(aiUser);
 
-    ResultModel resultModel = new ResultModel(0);
+        String prefixName = basepath+File.separator+"img"+File.separator;
+        ResultModel resultModel = new ResultModel(0);
     Map<String,Object> map1 = new HashMap<>();
-    map1.put("customerLogo",customerLogo);
+        String path = prefixName +"company_"+ companyId+ File.separator+"Customer"+ File.separator +customerLogo;
+    map1.put("customerLogo",path);
     //发送到手机,信息
     sendMessage(JSONObject.toJSONString(map1),aiUserId.toString());
     cacheService.choseOne(aiUserId,aiUser.getCompanyId(),aiUser.getGroupId());
@@ -122,7 +135,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     public void sendMessage(String content,String liase) {
 
-        jPushConfig.send(content,liase);
+        JPushConfig.send0(content,liase);
 
     }
 
@@ -133,6 +146,53 @@ public class CustomerServiceImpl implements CustomerService {
         aiCustomerRepository.updateLogo(customerId,logoPath);
         return resultModel;
     }
+
+    @Override
+    public ResultModel choseone2(Long aiUserId, String customerLogo, Long[] aiUserIds) {
+        if (aiUserId==-1){
+            AiUser aiUser2=null;
+            for (Long id:aiUserIds){
+                    aiUser2 = aiUserRepository.findByUserId(id);
+                    if (aiUser2==null){
+                        return new ResultModel(1003,"客服id无此人");
+                    }
+                    aiUser2.setAccepterStatus(1L);
+                    aiUserRepository.save(aiUser2);
+            }
+            cacheService.groupRecover(aiUser2.getCompanyId());
+            cacheService.choseOne2(aiUserId,aiUser2.getCompanyId(),aiUser2.getGroupId(),aiUserIds);
+            return new ResultModel(0);
+        }
+        if(NonUtil.isNon(aiUserId,customerLogo)){
+            return new ResultModel(1003);
+        }
+        if(aiUserIds.length==0){
+            return new ResultModel(1003);
+        }
+        AiUser aiUser = aiUserRepository.findByUserId(aiUserId);
+        Long companyId = aiUser.getCompanyId();
+        aiUser.setAccepterStatus(0L);
+        aiUserRepository.save(aiUser);
+
+        String prefixName = basepath+File.separator+"img"+File.separator;
+        ResultModel resultModel = new ResultModel(0);
+        Map<String,Object> map1 = new HashMap<>();
+        String path = prefixName +"company_"+ companyId+ File.separator+"Customer"+ File.separator +customerLogo;
+        map1.put("customerLogo",path);
+        for (Long id:aiUserIds){
+            if (aiUserId.longValue()!=id.longValue()) {
+                AiUser aiUser2 = aiUserRepository.findByUserId(id);
+                aiUser2.setAccepterStatus(1L);
+                 aiUserRepository.save(aiUser2);
+            }
+        }
+        //发送到手机,信息
+        sendMessage(JSONObject.toJSONString(map1),aiUserId.toString());
+        cacheService.choseOne2(aiUserId,aiUser.getCompanyId(),aiUser.getGroupId(),aiUserIds);
+        return resultModel;
+    }
+
+
 
 
 }

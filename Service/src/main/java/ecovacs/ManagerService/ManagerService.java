@@ -16,5 +16,19 @@ public interface ManagerService {
     ResultModel setTimesList(Long userId, Long[] AiuserIds, Long[] timesList);
     ResultModel setIndexlist(Long userId, Long[] AiuserIdlist, Long[] indexList);
     ResultModel getPassHistory(Long managerId);
-    ResultModel transfer(Long managerId, Long fromAiuserId, Long toAiuserId);
+    ResultModel transferAll(Long managerId, Long fromAiuserId, Long toAiuserId);
+
+    ResultModel getMyself(Long managerId, Long aiUserId);
+
+    ResultModel getPriRecord( Long managerId, Long aiUserId);
+
+    ResultModel register(Long managerId, String mobile, String passwd, String role, String name) ;
+
+    ResultModel resetRedis(Long managerId);
+
+    ResultModel setGrace(Long managerId, Long aiUserId, Long score);
+
+    ResultModel registerALL(Long managerId, String[] mobile, String[] name);
+
+    ResultModel transferOne(Long managerId, Long fromAiUserId, Long toaiUserId,Long customerId);
 }

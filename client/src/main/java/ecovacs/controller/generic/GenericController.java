@@ -38,7 +38,7 @@ public class GenericController {
                     dataType="String")
 
     } )
-    @RequestMapping(value = "/com/jdy/client/controller/user/go",method = RequestMethod.POST)
+    @RequestMapping(value = "/user/go",method = RequestMethod.POST)
     public ResultModel login1 (@RequestParam String mobile, @RequestParam String pass ) {
         if (mobile.length() <= 0 || pass.length() <= 0) {
             return new ResultModel(1002);

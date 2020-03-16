@@ -5,7 +5,9 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
-@Table(name = "robot")
+@Table(name = "robot",uniqueConstraints ={
+        @UniqueConstraint(columnNames = {"sn"})
+})
 public class RobotRecord {
 
     @Id
@@ -15,7 +17,7 @@ public class RobotRecord {
     private Long companyId;
 
     private Long userId;
-
+    @Column(name = "sn")
     private String sn;
 
     private Timestamp time;

@@ -12,13 +12,7 @@ import javax.persistence.*;
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "accepter",uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-        "company_id","group_id","sort_index"})
-        ,
         @UniqueConstraint(columnNames = {"user_id"})
-        ,
-        @UniqueConstraint(columnNames = {"up_logo"})
-
 })
 @ApiModel("置业顾问表")
 public class AiUser {
@@ -36,8 +30,7 @@ public class AiUser {
     private Long userId;
 
     @ApiModelProperty(value = "组内接待顺序，同公司同组唯一")
-    @Column(name = "sort_index")
-    private Long sortIndex;
+    private Long sortIndex=1L;
 
     @ApiModelProperty(value = "转交数")
     private Long passCount;
@@ -46,23 +39,28 @@ public class AiUser {
     private Long loseCount;
 
     @ApiModelProperty(value = "接待客户次数")
-    @Column(name = "distribute_count",columnDefinition = "Long default 0")
-    private Long distributeCount;
+    private Long distributeCount=0L;
 
     @ApiModelProperty(value = "可接待客户次数")
-    @Column(name = "accept_times",columnDefinition = "Long default 3")
-    private Long acceptTimes;
+    private Long acceptTimes=3L;
 
     @ApiModelProperty(value = "状态：0 在岗，其他离岗",example = "0")
     private Integer workStatus;
 
+
+    @ApiModelProperty(value = "状态：0 在接待，其他空闲",example = "0")
+    private Long accepterStatus=1L;
+
     @ApiModelProperty(value = "所属小组，默认0组未分组",example = "0")
-    @Column(name = "group_id",columnDefinition = "int default 0")
-    private int groupId;
+    private int groupId=0;
 
     @ApiModelProperty(value = "销售客服头像路径")
     @Column(name = "up_logo")
     private String upLogo;
+
+    @ApiModelProperty(value = "接待客户数量")
+    @Transient
+    private Long customerNum=0L;
 
 
     public String getUpLogo() {
@@ -93,12 +91,20 @@ public class AiUser {
     @Column(name = "score",columnDefinition = "int default 100")
     private Long score;
 
-    @Transient
     private String name;
+
+    public Long getAccepterStatus() {
+        return accepterStatus;
+    }
+
+    public void setAccepterStatus(Long accepterStatus) {
+        this.accepterStatus = accepterStatus;
+    }
 
     public int getGroupId() {
         return groupId;
     }
+
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
@@ -112,8 +118,13 @@ public class AiUser {
         this.acceptTimes = acceptTimes;
     }
 
+    public Long getCustomerNum() {
+        return customerNum;
+    }
 
-
+    public void setCustomerNum(Long customerNum) {
+        this.customerNum = customerNum;
+    }
 
     public Long getId() {
         return id;
