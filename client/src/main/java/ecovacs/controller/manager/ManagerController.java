@@ -3,10 +3,8 @@ package ecovacs.controller.manager;
 
 import ecovacs.ManagerService.ManagerService;
 import ecovacs.dao.model.ResultModel;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import ecovacs.pojo.AiCustomer;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -181,31 +179,30 @@ public class ManagerController {
                     dataType="Long")
             ,
             @ApiImplicitParam(
-                    name= "fromaiUserId",
+                    name= "fromAiUserId",
                     value= "被转交者id",
                     required= true,
                     paramType="query",
                     dataType="Long")
             ,
             @ApiImplicitParam(
-                    name= "toaiUserId",
+                    name= "toAiUserId",
                     value= "转交人",
                     required= true,
                     paramType="query",
                     dataType="Long")
-            , @ApiImplicitParam(
-            name= "customerId",
-            value= "转交客户Id",
-            required= true,
-            paramType="query",
-            dataType="Long")
-
-
+            ,
+            @ApiImplicitParam(
+                    name= "customerId",
+                    value= "转交客户Id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
     } )
-    @RequestMapping(value ="/transferAll",method = RequestMethod.POST)
-    public ResultModel transferOne(@RequestParam Long managerId, @RequestParam  Long fromAiUserId, @RequestParam  Long toaiUserId,@RequestParam Long customerId){
+    @RequestMapping(value ="/transferOne",method = RequestMethod.POST)
+    public ResultModel transferOne(@RequestParam Long managerId, @RequestParam  Long fromAiUserId, @RequestParam  Long toAiUserId,@RequestParam Long customerId){
 
-        return  managerService.transferOne(managerId,fromAiUserId,toaiUserId,customerId);
+        return  managerService.transferOne(managerId,fromAiUserId,toAiUserId,customerId);
 
     }
     @ApiOperation(
@@ -558,6 +555,28 @@ public class ManagerController {
 
         ResultModel resultModel = managerService.getPassHistory(managerId);
         return  resultModel;
+    }
+    @ApiOperation(value = "获得客户详细信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name= "customerId",
+                    value= "客户Id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+            ,
+            @ApiImplicitParam(
+                    name= "managerId",
+                    value= "管理id",
+                    required= true,
+                    paramType="query",
+                    dataType="Long")
+    })
+    @ApiResponse(code = 200,message = "客户跟进记录",response = AiCustomer.class)
+    @RequestMapping(value = "/getCustomerDetail",method = RequestMethod.POST)
+    public ResultModel getCustomerDetail( @RequestParam Long customerId,@RequestParam Long managerId) {
+        ResultModel result = managerService.getCustomerDetail(customerId,managerId);
+        return result;
     }
 
 }

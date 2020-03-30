@@ -31,4 +31,6 @@ public interface ManagerService {
     ResultModel registerALL(Long managerId, String[] mobile, String[] name);
 
     ResultModel transferOne(Long managerId, Long fromAiUserId, Long toaiUserId,Long customerId);
+
+    ResultModel getCustomerDetail(Long customerId, Long managerId);
 }

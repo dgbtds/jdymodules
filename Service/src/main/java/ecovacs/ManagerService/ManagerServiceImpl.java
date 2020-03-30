@@ -317,7 +317,7 @@ public class ManagerServiceImpl implements ManagerService {
             return new ResultModel(1003,"非一家公司人员");
         }
         AiCustomer customer = aiCustomerRepository.getOne(customerId);
-        if (customer==null||!(customerId.equals(fromAiuserId))){
+        if (customer==null||!(fromAiuserId.equals(customer.getCounselorId()))){
             ResultModel resultModel0 = new ResultModel(1003);
             resultModel0.setMessage("没有此销售人员或客户非被转交销售名下");
             return resultModel0;
@@ -345,6 +345,23 @@ public class ManagerServiceImpl implements ManagerService {
         ResultModel resultModel = new ResultModel(0);
         resultModel.setData(map);
 
+        return resultModel;
+    }
+
+    @Override
+    public ResultModel getCustomerDetail(Long customerId, Long managerId) {
+        Optional<AiCustomer> customer = aiCustomerRepository.findById(customerId);
+        AiCustomer aiCustomer = customer.get();
+        User manager=userRepository.getOne(managerId);
+        if (manager==null){
+            return new ResultModel(1003,"管理账户错误");
+        }
+        if(!aiCustomer.getCompanyId().equals(manager.getCompanyId())) {
+            return new ResultModel(1003,"非公司顾客");
+        }
+
+        ResultModel resultModel=new ResultModel(0);
+        resultModel.setData(aiCustomer);
         return resultModel;
     }
 
